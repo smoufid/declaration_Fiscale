@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,17 +11,14 @@
 </head>
 <body>
   <section class="hero is-primary is-bold">
-    <nav>
-      <ul >
-          <li><a href="retenueTvaSource.html" id="menu-versement">Versement Retenues Sources</a></li>
-          <li><a href="retenueTvaEtrangere.html" id="menu-tva-etrangeres">TVA Étrangères</a></li>
-          <li><a href="declarationtvaFournisseur75p.html" id="menu-tva-fournisseurs">TVA Fournisseurs 75%</a></li>
-          <li><a href="declarationtvaClientDebiteur.html" id="menu-tva-fournisseurs">TVA Client Debiteur</a></li>
-          <li><a href="declarationdeductiontva.html" id="menu-tva-fournisseurs">Déduction TVA</a></li>
-          <li><a href="declarationimmobilisations.html" id="menu-tva-fournisseurs">Immobilisation</a></li>
-          <li><a href="declarationIR.html" id="menu-tva-fournisseurs">Déclaration IR</a></li>
-      </ul>
-  </nav>
+    <div id="contenu"></div>
+
+    <script>
+      fetch("page-menu.html")
+        .then(response => response.text()) 
+        .then(data => document.getElementById("contenu").innerHTML = data)
+        .catch(error => console.error("Erreur de chargement :", error));
+    </script>
     <div class="hero-body">
       <h1 class="title">Convertion Déclaration TVA Fournisseur 75%</h1>
       <div class="field">
