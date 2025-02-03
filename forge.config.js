@@ -2,6 +2,19 @@ const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 
 module.exports = {
+  publishers: [
+    {
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'smoufid',
+          name: 'declaration_Fiscale'
+        },
+        prerelease: false,
+        draft: true
+      }
+    }
+  ],
   packagerConfig: {
     asar: true,
   },
@@ -29,6 +42,7 @@ module.exports = {
       name: '@electron-forge/plugin-auto-unpack-natives',
       config: {},
     },
+    
     // Fuses are used to enable/disable various Electron functionality
     // at package time, before code signing the application
     new FusesPlugin({
