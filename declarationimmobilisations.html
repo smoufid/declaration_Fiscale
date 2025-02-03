@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Convertion Declaration Immobilisations</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="style1.css">
+</head>
+<body>
+  <section class="hero is-primary is-bold">
+    <nav>
+      <ul >
+          <li><a href="retenueTvaSource.html" id="menu-versement">Versement Retenues Sources</a></li>
+          <li><a href="retenueTvaEtrangere.html" id="menu-tva-etrangeres">TVA Étrangères</a></li>
+          <li><a href="declarationtvaFournisseur75p.html" id="menu-tva-fournisseurs">TVA Fournisseurs 75%</a></li>
+          <li><a href="declarationtvaClientDebiteur.html" id="menu-tva-fournisseurs">TVA Client Debiteur</a></li>
+          <li><a href="declarationdeductiontva.html" id="menu-tva-fournisseurs">Déduction TVA</a></li>
+          <li><a href="declarationimmobilisations.html" id="menu-tva-fournisseurs">Immobilisation</a></li>
+          <li><a href="declarationIR.html" id="menu-tva-fournisseurs">Déclaration IR</a></li>
+      </ul>
+  </nav>
+    <div class="hero-body">
+      <h1 class="title">Convertion Déclaration Immobilisations</h1>
+      <div class="field">
+        <div class="file is-info">
+          <label class="file-label">
+            <input class="file-input" type="file" id="fileInputType1" accept=".csv">
+            <span class="file-cta">
+              <span class="file-label">Choisir un fichier CSV...</span>
+            </span>
+          </label>
+        </div>
+      </div>
+      <div class="field">
+        <button class="button is-primary" id="convertButtonType1">Convertion en XML</button>
+      </div>
+      <pre id="outputType1" class="box"> le Fichier source doit être dans le repertoire d:/dectva/in/</pre>
+      <pre id="outputType2" class="box"> le Fichier Resultat sera generer dans le repertoire d:/dectva/out/</pre>
+    </div>
+   
+  </section>
+  <script src="renderer-retenueimmobilisation.js"></script>
+</body>
+</html>
