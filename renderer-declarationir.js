@@ -14,7 +14,7 @@ function formatDate(dateStr) {
   const formattedDate = date.toISOString().split("T")[0];
   return formattedDate;
 }
-function recupererElementsExo(lines,matricule) {
+function recupererElementsExo(lines, matricule) {
   let elementsExo = [];
   lines.forEach((line) => {
     const parts = line.split(";").map((part) => part.trim());
@@ -44,7 +44,7 @@ function readCSV(filePath, callback) {
     let generalData = {};
     let occasionnels = [];
     let virements = [];
-    let permanents=[];
+    let permanents = [];
     lines.forEach((line) => {
       const parts = line.split(";").map((part) => part.trim());
       if (parts[0] === "ID") {
@@ -127,10 +127,9 @@ function readCSV(filePath, callback) {
       if (parts[0] === "RS") {
         virements.push({
           mois: parts[1].trim(),
-          totalVersement: parseFloat(
-            parts[2].trim().replace(",", ".")),
+          totalVersement: parseFloat(parts[2].trim().replace(",", ".")),
           dateDerniereVersment: formatDate(parts[3].trim()),
-          reference:   (parts[4].trim() ),
+          reference: parts[4].trim(),
           totalVerse: parseFloat(parts[5].trim().replace(",", ".")),
           principal: parseFloat(parts[6].trim().replace(",", ".")),
           penalite: parseFloat(parts[7].trim().replace(",", ".")),
@@ -138,7 +137,6 @@ function readCSV(filePath, callback) {
           dateVersement: formatDate(parts[9].trim()),
           refMoyenPaiement: parts[10].trim(),
           numQuittance: parts[11].trim(),
-
         });
       }
 
@@ -147,43 +145,47 @@ function readCSV(filePath, callback) {
           nom: cleanText(parts[1].trim()), // Nettoyage du texte parts[1].trim(),
           prenom: cleanText(parts[2].trim()),
           adressePersonnelle: cleanText(parts[3].trim()),
-          numCNI:   (parts[4].trim() ),
-          numCE:  parts[5].trim() ,
-          numPPR:  parts[6 ].trim(),
-          numCNSS:  parts[7].trim(),
-          ifu:  (parts[8].trim()),
+          numCNI: parts[4].trim(),
+          numCE: parts[5].trim(),
+          numPPR: parts[6].trim(),
+          numCNSS: parts[7].trim(),
+          ifu: parts[8].trim(),
           salaireBaseAnnuel: parseFloat(parts[29].trim().replace(",", ".")),
-          mtBrutTraitementSalaire: parseFloat(parts[9].trim().replace(",", ".")),
+          mtBrutTraitementSalaire: parseFloat(
+            parts[9].trim().replace(",", ".")
+          ),
           periode: parts[10].trim(),
-          mtExonere: parseFloat(parts[11].trim().replace(",", ".")), 
+          mtExonere: parseFloat(parts[11].trim().replace(",", ".")),
           mtEcheances: parseFloat(parts[12].trim().replace(",", ".")),
-          nbrReductions : parseFloat(parts[13].trim().replace(",", ".")),
+          nbrReductions: parseFloat(parts[13].trim().replace(",", ".")),
           mtIndemnite: parseFloat(parts[14].trim().replace(",", ".")),
           mtAvantages: parseFloat(parts[15].trim().replace(",", ".")),
-          mtRevenuBrutImposable:  parseFloat(parts[16].trim().replace(",", ".")),
+          mtRevenuBrutImposable: parseFloat(parts[16].trim().replace(",", ".")),
           mtFraisProfess: parseFloat(parts[17].trim().replace(",", ".")),
           mtCotisationAssur: parseFloat(parts[18].trim().replace(",", ".")),
           mtAutresRetenues: parseFloat(parts[19].trim().replace(",", ".")),
           mtRevenuNetImposable: parseFloat(parts[20].trim().replace(",", ".")),
           mtTotalDeduction: parseFloat(parts[21].trim().replace(",", ".")),
           irPreleve: parseFloat(parts[22].trim().replace(",", ".")),
-          casSportif:recupererCasSportif(parts[23].trim()),
+          casSportif: recupererCasSportif(parts[23].trim()),
           numMatricule: parts[24].trim(),
-          datePermis:'',
-          dateAutorisation:'',
+          datePermis: "",
+          dateAutorisation: "",
           refSituationFamiliale: parts[27].trim(),
           refTaux: parts[28].trim(),
-          elementsexo:recupererElementsExo(lines.filter(line => line.startsWith("XO")),parts[24].trim()),
-        }); 
+          elementsexo: recupererElementsExo(
+            lines.filter((line) => line.startsWith("XO")),
+            parts[24].trim()
+          ),
+        });
       }
-
     });
-    callback({ generalData, occasionnels, virements,permanents });
+    callback({ generalData, occasionnels, virements, permanents });
   });
 }
 // Fonction pour générer le fichier XML
 function generateXML(data, outputDir) {
-  const { generalData, occasionnels, virements,permanents } = data;
+  const { generalData, occasionnels, virements, permanents } = data;
 
   //  alert(JSON.stringify(generalData));
 
@@ -242,51 +244,51 @@ function generateXML(data, outputDir) {
       referenceDeclaration: generalData.referenceDeclaration,
     },
   };
-if (  permanents.length > 0) {
-  xmlData.TraitementEtSalaire.listPersonnelPermanent = {
-    PersonnelPermanent: permanents.map((v) => ({
-      nom: v.nom.trim(), // Nettoyage du texte
-      prenom: v.prenom.trim(), // Nettoyage du texte  
-      adressePersonnelle: v.adressePersonnelle.trim(), // Nettoyage du texte  
-      numCNI: v.numCNI, // Nettoyage du texte      
-      numCE: v.numCE, // Nettoyage du texte      
-      numPPR: v.numPPR, // Nettoyage du texte      
-      numCNSS: v.numCNSS, // Nettoyage du texte      
-      ifu: v.ifu, // Nettoyage du texte      
-      salaireBaseAnnuel: v.salaireBaseAnnuel.toFixed(2), // Nettoyage du texte      
-      mtBrutTraitementSalaire: v.mtBrutTraitementSalaire.toFixed(2),
-      periode: v.periode ,
-      mtExonere: v.mtExonere.toFixed(2),
-      mtEcheances: v.mtEcheances.toFixed(2),
-      nbrReductions: v.nbrReductions.toFixed(2),
-      mtIndemnite: v.mtIndemnite.toFixed(2),
-      mtAvantages: v.mtAvantages.toFixed(2),
-      mtRevenuBrutImposable: v.mtRevenuBrutImposable.toFixed(2),
-      mtFraisProfess: v.mtFraisProfess.toFixed(2),
-      mtRevenuNetImposable: v.mtRevenuNetImposable.toFixed(2),
-      mtTotalDeduction: v.mtTotalDeduction.toFixed(2),
-      irPreleve: v.irPreleve.toFixed(2),
-      casSportif: v.casSportif,
-      numMatricule: v.numMatricule,
-      datePermis: v.datePermis,
-      dateAutorisation: v.dateAutorisation,
-      refSituationFamiliale:{
-        code: v.refSituationFamiliale
-      },
-      refTaux: {
-        code: v.refTaux
-      },
-      listElementsExonere:{
-        ElementExonerePP: v.elementsexo.map((v) => ({ 
-          montantExonere: v.montantExonere.toFixed(2),
-          refNatureElementExonere:{
-            code: v.refNatureElementExonere
-          } 
-        }))
-      }
-    })),
-  };
-}
+  if (permanents.length > 0) {
+    xmlData.TraitementEtSalaire.listPersonnelPermanent = {
+      PersonnelPermanent: permanents.map((v) => ({
+        nom: v.nom.trim(), // Nettoyage du texte
+        prenom: v.prenom.trim(), // Nettoyage du texte
+        adressePersonnelle: v.adressePersonnelle.trim(), // Nettoyage du texte
+        numCNI: v.numCNI, // Nettoyage du texte
+        numCE: v.numCE, // Nettoyage du texte
+        numPPR: v.numPPR, // Nettoyage du texte
+        numCNSS: v.numCNSS, // Nettoyage du texte
+        ifu: v.ifu, // Nettoyage du texte
+        salaireBaseAnnuel: v.salaireBaseAnnuel.toFixed(2), // Nettoyage du texte
+        mtBrutTraitementSalaire: v.mtBrutTraitementSalaire.toFixed(2),
+        periode: v.periode,
+        mtExonere: v.mtExonere.toFixed(2),
+        mtEcheances: v.mtEcheances.toFixed(2),
+        nbrReductions: v.nbrReductions.toFixed(2),
+        mtIndemnite: v.mtIndemnite.toFixed(2),
+        mtAvantages: v.mtAvantages.toFixed(2),
+        mtRevenuBrutImposable: v.mtRevenuBrutImposable.toFixed(2),
+        mtFraisProfess: v.mtFraisProfess.toFixed(2),
+        mtRevenuNetImposable: v.mtRevenuNetImposable.toFixed(2),
+        mtTotalDeduction: v.mtTotalDeduction.toFixed(2),
+        irPreleve: v.irPreleve.toFixed(2),
+        casSportif: v.casSportif,
+        numMatricule: v.numMatricule,
+        datePermis: v.datePermis,
+        dateAutorisation: v.dateAutorisation,
+        refSituationFamiliale: {
+          code: v.refSituationFamiliale,
+        },
+        refTaux: {
+          code: v.refTaux,
+        },
+        listElementsExonere: {
+          ElementExonerePP: v.elementsexo.map((v) => ({
+            montantExonere: v.montantExonere.toFixed(2),
+            refNatureElementExonere: {
+              code: v.refNatureElementExonere,
+            },
+          })),
+        },
+      })),
+    };
+  }
   if (occasionnels.length > 0) {
     xmlData.TraitementEtSalaire.listPersonnelOccasionnel = {
       PersonnelOccasionnel: occasionnels.map((v) => ({
@@ -305,24 +307,24 @@ if (  permanents.length > 0) {
 
   if (virements.length > 0) {
     xmlData.TraitementEtSalaire.listVersements = {
-        VersementTraitementSalaire: virements.map((v) => ({
-            mois: v.mois,
-            totalVersement: v.totalVersement.toFixed(2),
-            dateDerniereVersment: v.dateDerniereVersment,
-            listDetailPaiement:{
-                DetailPaiementTraitementSalaire:{
-            reference:   (v.reference ),
+      VersementTraitementSalaire: virements.map((v) => ({
+        mois: v.mois,
+        totalVersement: v.totalVersement.toFixed(2),
+        dateDerniereVersment: v.dateDerniereVersment,
+        listDetailPaiement: {
+          DetailPaiementTraitementSalaire: {
+            reference: v.reference,
             totalVerse: v.totalVerse.toFixed(2),
-            principal:  (v.principal.toFixed(2)),
-            penalite:  (v.penalite.toFixed(2)),
-            majorations:  (v.majorations.toFixed(2)),
-            dateVersement:  (v.dateVersement),
+            principal: v.principal.toFixed(2),
+            penalite: v.penalite.toFixed(2),
+            majorations: v.majorations.toFixed(2),
+            dateVersement: v.dateVersement,
             refMoyenPaiement: {
-                code: v.refMoyenPaiement
+              code: v.refMoyenPaiement,
             },
             numQuittance: v.numQuittance,
-                }
-            }
+          },
+        },
       })),
     };
   }
