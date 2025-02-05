@@ -17,15 +17,9 @@ function getMonthNumber(monthName) {
     return months[monthName.toLowerCase()] || "0";
 }
 function formatDate(dateStr) {
-    // On suppose que la date est dans le format "dd/MM/yyyy"
     const [day, month, year] = dateStr.split('/');
-
-    // Créer un objet Date en utilisant les valeurs extraites
     const date = new Date(year, month - 1, day); // Les mois commencent à 0 dans l'objet Date
-
-    // Formater la date dans le format "yyyy-MM-dd"
     const formattedDate = date.toISOString().split('T')[0];
-
     return formattedDate;
 }
 // Fonction pour lire le fichier CSV
