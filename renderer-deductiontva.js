@@ -92,8 +92,6 @@ function readCSV(filePath, callback) {
         }
     });
 }
-
-// Fonction pour générer le fichier XML
 function generateXML(data, outputDir) {
     const { generalData, versements } = data;
     const datesys = getFormattedDate();
@@ -126,7 +124,6 @@ function generateXML(data, outputDir) {
             }
         }
     };
-
     const builder = new xml2js.Builder({ headless: false, renderOpts: { pretty: true } });
     const xmlContent = builder.buildObject(xmlData);
     const uuid = crypto.randomUUID();
@@ -141,10 +138,6 @@ function generateXML(data, outputDir) {
         }
     });
 }
-
-// Écouter l'événement 'file-opened' envoyé depuis main.js
-
-
 document.getElementById('convertButtonType1').addEventListener('click', () => {
     ipcRenderer.on('file-opened', (event, filePath) => {
         alert('Fichier ouvert: ' + filePath);  // Afficher une alerte pour confirmer que le fichier a été ouvert
@@ -165,15 +158,10 @@ document.getElementById('convertButtonType1').addEventListener('click', () => {
         alert('No file selected');
         return;
     }
-
-    //alert('File selected: ' + file.name); // Afficher le nom du fichier
-
     const reader = new FileReader();
     reader.onload = function (e) {
         const csvData = e.target.result;
-        //alert('CSV data loaded'); // Log pour débogage
-        const filetrt = 'd:/dectva/in' + file.name;
-        // Passer les données CSV lues pour traitement
+        const filetrt = 'd:/dectva/in/' + file.name;
         readCSV(filetrt, (data) => {
             const outputDir = 'd:/dectva/out/';
             generateXML(data, outputDir);
