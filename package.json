@@ -9,7 +9,7 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish"
   },
-  "author": "Moufid",
+  "author": "Agence Nationale des Ports",
   "license": "ISC",
   "devDependencies": {
     "@electron-forge/cli": "^7.6.1",
@@ -27,6 +27,7 @@
     "csv-parser": "^3.2.0",
     "electron-debug": "^4.1.0",
     "electron-squirrel-startup": "^1.0.1",
+    "winston": "^3.17.0",
     "xml2js": "^0.6.2"
   }
 }

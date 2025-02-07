@@ -58,7 +58,6 @@ function readCSV(filePath, callback) {
 // Fonction pour générer le fichier XML
 function generateXML(data, outputDir) {
   const { generalData, versements } = data;
-
   const xmlData = {
     versDRVT: {
       identifiantFiscal: generalData.identifiantFiscal,

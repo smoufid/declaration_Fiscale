@@ -3,6 +3,22 @@ const fs = require("fs");
 const path = require("path");
 const { json } = require("stream/consumers");
 const xml2js = require("xml2js");
+const winston = require("winston");
+
+const logger = winston.createLogger({
+  level: "info",
+  format: winston.format.combine(
+    winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), // Ajout de la date
+    winston.format.printf(({ timestamp, level, message }) => {
+      return `${timestamp} [${level.toUpperCase()}] ${message}`;
+    })
+  ),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: "log/log-declarationir.log" }),
+  ],
+});
+
 //const config = require('../config.json');
 // Fonction pour nettoyer le texte
 function cleanText(text) {
@@ -46,138 +62,222 @@ function readCSV(filePath, callback) {
     let virements = [];
     let permanents = [];
     lines.forEach((line) => {
-      const parts = line.split(";").map((part) => part.trim());
-      if (parts[0] === "ID") {
-        Object.assign(generalData, {
-          identifiantFiscal: parts[1].trim(),
-          nom: cleanText(parts[2].trim()),
-          prenom: cleanText(parts[3].trim()),
-          raisonSociale: cleanText(parts[4].trim()),
-          exerciceFiscalDu: formatDate(parts[5].trim()),
-          exerciceFiscalAu: formatDate(parts[6].trim()),
-          annee: parts[7].trim(),
-          commune: parts[8].trim(),
-          adresse: cleanText(parts[9].trim()),
-          numeroCIN: "",
-          numeroCNSS: "",
-          numeroCE: "",
-          numeroRC: "",
-          identifiantTP: parts[16].trim(),
-          numeroFax: parts[14].trim(),
-          numeroTelephone: parts[15].trim(),
-          email: parts[17].trim(),
-        });
-      }
-      if (parts[0] === "EF") {
-        Object.assign(generalData, {
-          effectifTotal: parts[1].trim(),
-          nbrPersoPermanent: parts[2].trim(),
-          nbrPersoOccasionnel: parts[3].trim(),
-          nbrStagiaires: parts[4].trim(),
-        });
-      }
-      if (parts[0] === "TT") {
-        Object.assign(generalData, {
-          totalMtRevenuBrutImposablePP: parseFloat(
-            parts[1].trim().replace(",", ".")
-          ),
-          totalMtRevenuNetImposablePP: parseFloat(
-            parts[2].trim().replace(",", ".")
-          ),
-          totalMtTotalDeductionPP: parseFloat(
-            parts[3].trim().replace(",", ".")
-          ),
-          totalMtIrPrelevePP: parseFloat(parts[4].trim().replace(",", ".")),
-          totalMtBrutSommesPO: parseFloat(parts[5].trim().replace(",", ".")),
-          totalIrPrelevePO: parseFloat(parts[6].trim().replace(",", ".")),
-          totalMtBrutTraitSalaireSTG: parseFloat(
-            parts[7].trim().replace(",", ".")
-          ),
-          totalMtBrutIndemnitesSTG: parseFloat(
-            parts[8].trim().replace(",", ".")
-          ),
-          totalMtRetenuesSTG: parseFloat(parts[9].trim().replace(",", ".")),
-          totalMtRevenuNetImpSTG: parseFloat(
-            parts[10].trim().replace(",", ".")
-          ),
-          totalSommePayeRTS: parseFloat(parts[11].trim().replace(",", ".")),
-          totalmtAnuuelRevenuSalarial: parseFloat(
-            parts[12].trim().replace(",", ".")
-          ),
-          totalmtAbondement: parseFloat(parts[13].trim().replace(",", ".")),
-          montantPermanent: parseFloat(parts[14].trim().replace(",", ".")),
-          montantOccasionnel: parseFloat(parts[15].trim().replace(",", ".")),
-          montantStagiaire: parseFloat(parts[16].trim().replace(",", ".")),
-          referenceDeclaration: parts[17].trim(),
-        });
-      }
-      if (parts[0] === "OC") {
-        occasionnels.push({
-          nom: cleanText(parts[1].trim()), // Nettoyage du texte
-          prenom: cleanText(parts[2].trim()),
-          adressePersonnelle: cleanText(parts[3].trim()), // Nettoyage du texte
-          numCNI: parts[4].trim(), // Nettoyage du texte
-          numCE: cleanText(parts[5].trim()), // Nettoyage du texte
-          ifu: parts[6].trim(),
-          mtBrutSommes: parseFloat(parts[7].trim().replace(",", ".")),
-          irPreleve: parseFloat(parts[8].trim().replace(",", ".")),
-          profession: cleanText(parts[9].trim()),
-        });
-      }
-      if (parts[0] === "RS") {
-        virements.push({
-          mois: parts[1].trim(),
-          totalVersement: parseFloat(parts[2].trim().replace(",", ".")),
-          dateDerniereVersment: formatDate(parts[3].trim()),
-          reference: parts[4].trim(),
-          totalVerse: parseFloat(parts[5].trim().replace(",", ".")),
-          principal: parseFloat(parts[6].trim().replace(",", ".")),
-          penalite: parseFloat(parts[7].trim().replace(",", ".")),
-          majorations: parseFloat(parts[8].trim().replace(",", ".")),
-          dateVersement: formatDate(parts[9].trim()),
-          refMoyenPaiement: parts[10].trim(),
-          numQuittance: parts[11].trim(),
-        });
-      }
+      try {
+        const parts = line.split(";").map((part) => part.trim());
+        if (parts[0] === "ID") {
+          try {
+            logger.info("Ligne ID : " + JSON.stringify(parts, null, 2));
+            Object.assign(generalData, {
+              identifiantFiscal: parts[1].trim(),
+              nom: cleanText(parts[2].trim()),
+              prenom: cleanText(parts[3].trim()),
+              raisonSociale: cleanText(parts[4].trim()),
+              exerciceFiscalDu: formatDate(parts[5].trim()),
+              exerciceFiscalAu: formatDate(parts[6].trim()),
+              annee: parts[7].trim(),
+              commune: parts[8].trim(),
+              adresse: cleanText(parts[9].trim()),
+              numeroCIN: "",
+              numeroCNSS: "",
+              numeroCE: "",
+              numeroRC: "",
+              identifiantTP: parts[16].trim(),
+              numeroFax: parts[14].trim(),
+              numeroTelephone: parts[15].trim(),
+              email: parts[17].trim(),
+            });
+          } catch (error) {
+            logger.error(
+              `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+            );
+            alert(
+              `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+            );
+            return;
+          }
+        }
+        if (parts[0] === "EF") {
+          try {
+            logger.info("Ligne EF : " + JSON.stringify(parts, null, 2));
+            Object.assign(generalData, {
+              effectifTotal: parts[1].trim(),
+              nbrPersoPermanent: parts[2].trim(),
+              nbrPersoOccasionnel: parts[3].trim(),
+              nbrStagiaires: parts[4].trim(),
+            });
+          } catch (error) {
+            logger.error(
+              `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+            );
+            alert(
+              `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+            );
+            return;
+          }
+        }
+        if (parts[0] === "TT") {
+          try {
+            logger.info("Ligne TT : " + JSON.stringify(parts, null, 2));
+            Object.assign(generalData, {
+              totalMtRevenuBrutImposablePP: parseFloat(
+                parts[1].trim().replace(",", ".")
+              ),
+              totalMtRevenuNetImposablePP: parseFloat(
+                parts[2].trim().replace(",", ".")
+              ),
+              totalMtTotalDeductionPP: parseFloat(
+                parts[3].trim().replace(",", ".")
+              ),
+              totalMtIrPrelevePP: parseFloat(parts[4].trim().replace(",", ".")),
+              totalMtBrutSommesPO: parseFloat(
+                parts[5].trim().replace(",", ".")
+              ),
+              totalIrPrelevePO: parseFloat(parts[6].trim().replace(",", ".")),
+              totalMtBrutTraitSalaireSTG: parseFloat(
+                parts[7].trim().replace(",", ".")
+              ),
+              totalMtBrutIndemnitesSTG: parseFloat(
+                parts[8].trim().replace(",", ".")
+              ),
+              totalMtRetenuesSTG: parseFloat(parts[9].trim().replace(",", ".")),
+              totalMtRevenuNetImpSTG: parseFloat(
+                parts[10].trim().replace(",", ".")
+              ),
+              totalSommePayeRTS: parseFloat(parts[11].trim().replace(",", ".")),
+              totalmtAnuuelRevenuSalarial: parseFloat(
+                parts[12].trim().replace(",", ".")
+              ),
+              totalmtAbondement: parseFloat(parts[13].trim().replace(",", ".")),
+              montantPermanent: parseFloat(parts[14].trim().replace(",", ".")),
+              montantOccasionnel: parseFloat(
+                parts[15].trim().replace(",", ".")
+              ),
+              montantStagiaire: parseFloat(parts[16].trim().replace(",", ".")),
+              referenceDeclaration: parts[17].trim(),
+            });
+          } catch (error) {
+            logger.error(
+              `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+            );
+            alert(
+              `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+            );
+            return;
+          }
+        }
+        if (parts[0] === "OC") {
+          try {
+            logger.info("Ligne OC : " + JSON.stringify(parts, null, 2));
+            occasionnels.push({
+              nom: cleanText(parts[1].trim()), // Nettoyage du texte
+              prenom: cleanText(parts[2].trim()),
+              adressePersonnelle: cleanText(parts[3].trim()), // Nettoyage du texte
+              numCNI: parts[4].trim(), // Nettoyage du texte
+              numCE: cleanText(parts[5].trim()), // Nettoyage du texte
+              ifu: parts[6].trim(),
+              mtBrutSommes: parseFloat(parts[7].trim().replace(",", ".")),
+              irPreleve: parseFloat(parts[8].trim().replace(",", ".")),
+              profession: cleanText(parts[9].trim()),
+            });
+          } catch (error) {
+            logger.error(
+              `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+            );
+            alert(
+              `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+            );
+            return;
+          }
+        }
+        if (parts[0] === "RS") {
+          try {
+            logger.info("Ligne RS : " + JSON.stringify(parts, null, 2));
+            virements.push({
+              mois: parts[1].trim(),
+              totalVersement: parseFloat(parts[2].trim().replace(",", ".")),
+              dateDerniereVersment: formatDate(parts[3].trim()),
+              reference: parts[4].trim(),
+              totalVerse: parseFloat(parts[5].trim().replace(",", ".")),
+              principal: parseFloat(parts[6].trim().replace(",", ".")),
+              penalite: parseFloat(parts[7].trim().replace(",", ".")),
+              majorations: parseFloat(parts[8].trim().replace(",", ".")),
+              dateVersement: formatDate(parts[9].trim()),
+              refMoyenPaiement: parts[10].trim(),
+              numQuittance: parts[11].trim(),
+            });
+          } catch (error) {
+            logger.error(
+              `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+            );
+            alert(
+              `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+            );
+            return;
+          }
+        }
 
-      if (parts[0] === "PP") {
-        permanents.push({
-          nom: cleanText(parts[1].trim()), // Nettoyage du texte parts[1].trim(),
-          prenom: cleanText(parts[2].trim()),
-          adressePersonnelle: cleanText(parts[3].trim()),
-          numCNI: parts[4].trim(),
-          numCE: parts[5].trim(),
-          numPPR: parts[6].trim(),
-          numCNSS: parts[7].trim(),
-          ifu: parts[8].trim(),
-          salaireBaseAnnuel: parseFloat(parts[29].trim().replace(",", ".")),
-          mtBrutTraitementSalaire: parseFloat(
-            parts[9].trim().replace(",", ".")
-          ),
-          periode: parts[10].trim(),
-          mtExonere: parseFloat(parts[11].trim().replace(",", ".")),
-          mtEcheances: parseFloat(parts[12].trim().replace(",", ".")),
-          nbrReductions: parseFloat(parts[13].trim().replace(",", ".")),
-          mtIndemnite: parseFloat(parts[14].trim().replace(",", ".")),
-          mtAvantages: parseFloat(parts[15].trim().replace(",", ".")),
-          mtRevenuBrutImposable: parseFloat(parts[16].trim().replace(",", ".")),
-          mtFraisProfess: parseFloat(parts[17].trim().replace(",", ".")),
-          mtCotisationAssur: parseFloat(parts[18].trim().replace(",", ".")),
-          mtAutresRetenues: parseFloat(parts[19].trim().replace(",", ".")),
-          mtRevenuNetImposable: parseFloat(parts[20].trim().replace(",", ".")),
-          mtTotalDeduction: parseFloat(parts[21].trim().replace(",", ".")),
-          irPreleve: parseFloat(parts[22].trim().replace(",", ".")),
-          casSportif: recupererCasSportif(parts[23].trim()),
-          numMatricule: parts[24].trim(),
-          datePermis: "",
-          dateAutorisation: "",
-          refSituationFamiliale: parts[27].trim(),
-          refTaux: parts[28].trim(),
-          elementsexo: recupererElementsExo(
-            lines.filter((line) => line.startsWith("XO")),
-            parts[24].trim()
-          ),
-        });
+        if (parts[0] === "PP") {
+          try {
+            logger.info("Ligne PP : " + JSON.stringify(parts, null, 2));
+            permanents.push({
+              nom: cleanText(parts[1].trim()), // Nettoyage du texte parts[1].trim(),
+              prenom: cleanText(parts[2].trim()),
+              adressePersonnelle: cleanText(parts[3].trim()),
+              numCNI: parts[4].trim(),
+              numCE: parts[5].trim(),
+              numPPR: parts[6].trim(),
+              numCNSS: parts[7].trim(),
+              ifu: parts[8].trim(),
+              salaireBaseAnnuel: parseFloat(parts[29].trim().replace(",", ".")),
+              mtBrutTraitementSalaire: parseFloat(
+                parts[9].trim().replace(",", ".")
+              ),
+              periode: parts[10].trim(),
+              mtExonere: parseFloat(parts[11].trim().replace(",", ".")),
+              mtEcheances: parseFloat(parts[12].trim().replace(",", ".")),
+              nbrReductions: parseFloat(parts[13].trim().replace(",", ".")),
+              mtIndemnite: parseFloat(parts[14].trim().replace(",", ".")),
+              mtAvantages: parseFloat(parts[15].trim().replace(",", ".")),
+              mtRevenuBrutImposable: parseFloat(
+                parts[16].trim().replace(",", ".")
+              ),
+              mtFraisProfess: parseFloat(parts[17].trim().replace(",", ".")),
+              mtCotisationAssur: parseFloat(parts[18].trim().replace(",", ".")),
+              mtAutresRetenues: parseFloat(parts[19].trim().replace(",", ".")),
+              mtRevenuNetImposable: parseFloat(
+                parts[20].trim().replace(",", ".")
+              ),
+              mtTotalDeduction: parseFloat(parts[21].trim().replace(",", ".")),
+              irPreleve: parseFloat(parts[22].trim().replace(",", ".")),
+              casSportif: recupererCasSportif(parts[23].trim()),
+              numMatricule: parts[24].trim(),
+              datePermis: "",
+              dateAutorisation: "",
+              refSituationFamiliale: parts[27].trim(),
+              refTaux: parts[28].trim(),
+              elementsexo: recupererElementsExo(
+                lines.filter((line) => line.startsWith("XO")),
+                parts[24].trim()
+              ),
+            });
+          } catch (error) {
+            logger.error(
+              `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+            );
+            alert(
+              `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+            );
+            return;
+          }
+        }
+      } catch (error) {
+        logger.error(
+          `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+        );
+        alert(
+          `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+        );
+        return;
       }
     });
     callback({ generalData, occasionnels, virements, permanents });
