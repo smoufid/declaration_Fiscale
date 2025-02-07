@@ -85,10 +85,11 @@ function readCSV(filePath, callback) {
               numeroFax: parts[14].trim(),
               numeroTelephone: parts[15].trim(),
               email: parts[17].trim(),
+              
             });
           } catch (error) {
             logger.error(
-              `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+              `Erreur lors du traitement de la ligne: ${line}.  Erreur detaille: ${error.message}`
             );
             alert(
               `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`

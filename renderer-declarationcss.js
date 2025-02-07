@@ -37,6 +37,8 @@ function readCSV(filePath, callback) {
         lines.forEach(line => {
             const parts = line.split(";").map(part => part.trim());
             if (parts[0] === "E") {
+                try {
+                    logger.info("Ligne E : " + JSON.stringify(parts, null, 2));
                 generalData = {
                     identifiantFiscal: parts[1],
                     raisonSociale: 'AGENCE NATIONALE DES PORTS',
@@ -47,6 +49,15 @@ function readCSV(filePath, callback) {
                     totalMontantContribution: parseFloat(parts[6].trim().replace(",", ".")),
                     totalContributionVerse: parseFloat(parts[7].trim().replace(",", ".")),
                 };
+            } catch (error) {
+                logger.error(
+                  `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+                );
+                alert(
+                  `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+                );
+                return;
+              }
             } else if (parts[0] === "D") {
                 personnels.push({
                     numeroMatricule: (parts[1].trim()), // Nettoyage du texte
