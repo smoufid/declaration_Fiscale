@@ -110,3 +110,59 @@
   "",
   ""
 ]
+2025-02-07 11:06:17 [INFO] Ligne ID : [
+  "E",
+  "1508000",
+  "2024",
+  "11",
+  "Mensuel",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  ""
+]
+2025-02-07 11:06:17 [INFO] Ligne DETAIL : [
+  "D",
+  "PRODEVELOP",
+  "PASEO CIUDADELA, 13 ENT 2, 3 Y 4",
+  "2222",
+  "maintenance corrective et �volutive du systelme de gestion du domaine public portuaire de l'ANP",
+  "14/11/2024",
+  "920504,40",
+  "20",
+  "184100,88",
+  "",
+  "",
+  ""
+]
+2025-02-07 11:06:17 [INFO] Ligne DETAIL : [
+  "D",
+  "SURTYMAR",
+  "IMMEUBLE LE 107-107, AVENUE HENRI FREVILLE - BP 10704 -  35207 � RENNES CEDEX 2",
+  "2222",
+  "ETUDE D'EVALUATION ET ELABORATION DU PLAN DE SURETE",
+  "12/11/2024",
+  "56186,00",
+  "20",
+  "11237,20",
+  "",
+  "",
+  ""
+]
+2025-02-07 11:06:17 [INFO] Ligne DETAIL : [
+  "D",
+  "BERD",
+  "5 bank street, London, E14 4RG",
+  "2222",
+  "Commission d'engagement du 16/04 au 15/10/2024",
+  "15/11/2024",
+  "405169,52",
+  "20",
+  "40516,95",
+  "",
+  "",
+  ""
+]
