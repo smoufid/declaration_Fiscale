@@ -2,8 +2,19 @@ const { ipcRenderer, remote } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const xml2js = require('xml2js');
-//const config = require('../config.json');
-// Fonction pour nettoyer le texte
+const logger = winston.createLogger({
+  level: "info",
+  format: winston.format.combine(
+    winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), // Ajout de la date
+    winston.format.printf(({ timestamp, level, message }) => {
+      return `${timestamp} [${level.toUpperCase()}] ${message}`;
+    })
+  ),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: "log/log-tvaEtrangere.log" }),
+  ],
+});
 function cleanText(text) {
     return text.replace(/[^\w\s]/gi, '');
 }
@@ -83,6 +94,7 @@ function readCSV(filePath, callback) {
         lines.forEach(line => {
             const parts = line.split(";").map(part => part.trim());
             if (parts[0] === "E") {
+                try{
                 generalData = {
                     identifiantFiscal: parts[1],
                     exerciceFiscalDu: parts[2],
@@ -92,7 +104,17 @@ function readCSV(filePath, callback) {
                     numTSCLocaleDec: parts[6],
                     adressLocaleDec: cleanText(parts[7]),
                 };
+            } catch (error) {
+                logger.error(
+                  `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+                );
+                alert(
+                  `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+                );
+                return;
+              }
             } else if (parts[0] === "T") {
+                try{
                 terrains.push({
                     refNatureAcquision: codenatacquisitionterrains(parts[1].trim()), // Nettoyage du texte
                     estImmatricule: '1',
@@ -104,7 +126,17 @@ function readCSV(filePath, callback) {
                     prixAcquision: parseFloat(parts[7].trim().replace(",", ".")), // Conversion en nombre
                     dateAcquisition: (parts[8].trim()), // Nettoyage du texte
                 });
+            } catch (error) {
+                logger.error(
+                  `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+                );
+                alert(
+                  `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+                );
+                return;
+              }
             }else if (parts[0] === "M") {
+                try{
                 materiels.push({ refDesignationMat : retRefMateriel(parts[1].trim()),
                 refEtatAcquision:retRefEtatAcquisitionMateriel(parts[2].trim().toUpperCase()),
                 refStatutPatrimonial:refstatutsMateriel(parts[3].trim().toUpperCase()) ,
@@ -112,7 +144,17 @@ function readCSV(filePath, callback) {
                 dateMiseEnService:  (parts[5].trim()),
                 prixAcquisition:parseFloat(parts[6].trim().replace(",", "."))
             });
+        } catch (error) {
+            logger.error(
+              `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+            );
+            alert(
+              `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+            );
+            return;
+          }
             }else if (parts[0] === "R") {
+                try{
                 retraits.push({  designationRetrait: retRefMateriel(parts[1].trim()),
                     natureOperationRetrait:retrefNatureRetrait(parts[2].trim().toUpperCase()),
                     numTSC:  (parts[3].trim()),
@@ -122,6 +164,15 @@ function readCSV(filePath, callback) {
                     dateAcquisition:  (parts[7].trim()),
                     dateRetrait:  (parts[8].trim())
                 });
+            } catch (error) {
+                logger.error(
+                  `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+                );
+                alert(
+                  `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+                );
+                return;
+              }
             }
         });
    //   alert(retraits);

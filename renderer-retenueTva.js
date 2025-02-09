@@ -2,8 +2,19 @@ const { ipcRenderer, remote } = require("electron");
 const fs = require("fs");
 const path = require("path");
 const xml2js = require("xml2js");
-const config = require("./config.json");
-// Fonction pour nettoyer le texte
+const logger = winston.createLogger({
+  level: "info",
+  format: winston.format.combine(
+    winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), // Ajout de la date
+    winston.format.printf(({ timestamp, level, message }) => {
+      return `${timestamp} [${level.toUpperCase()}] ${message}`;
+    })
+  ),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: "log/log-retenuetva.log" }),
+  ],
+});
 function cleanText(text) {
   return text.replace(/[^\w\s]/gi, "");
 }
@@ -25,13 +36,24 @@ function readCSV(filePath, callback) {
     lines.forEach((line) => {
       const parts = line.split(";").map((part) => part.trim());
       if (parts[0] === "E") {
+        try{
         generalData = {
           identifiantFiscal: parts[1],
           exerciceFiscalDu: parts[2],
           exerciceFiscalAu: parts[3],
           moisVers: parts[4],
         };
+      } catch (error) {
+        logger.error(
+          `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+        );
+        alert(
+          `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+        );
+        return;
+      }
       } else if (parts[0] === "D") {
+        try{
         let tauxRetenueSource = parseInt(parts[4], 10);
         if (tauxRetenueSource === 5) {
           tauxRetenueSource = 229;
@@ -49,6 +71,15 @@ function readCSV(filePath, callback) {
           montantRemunSoumise: parseFloat(parts[6].replace(",", ".")),
           montantRetenueSource: parseFloat(parts[7].replace(",", ".")),
         });
+      } catch (error) {
+        logger.error(
+          `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+        );
+        alert(
+          `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+        );
+        return;
+      }
       }
     });
 
