@@ -2,6 +2,7 @@ const { ipcRenderer, remote } = require("electron");
 const fs = require("fs");
 const path = require("path");
 const xml2js = require("xml2js");
+const winston = require("winston");
 const logger = winston.createLogger({
   level: "info",
   format: winston.format.combine(

@@ -2,8 +2,21 @@ const { ipcRenderer, remote } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const xml2js = require('xml2js');
-//const config = require('../config.json');
-// Fonction pour nettoyer le texte
+const winston = require("winston");
+
+const logger = winston.createLogger({
+  level: "info",
+  format: winston.format.combine(
+    winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), // Ajout de la date
+    winston.format.printf(({ timestamp, level, message }) => {
+      return `${timestamp} [${level.toUpperCase()}] ${message}`;
+    })
+  ),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: "log/log-tvaEtrangere.log" }),
+  ],
+});
 function cleanText(text) {
     return text.replace(/[^\w\s]/gi, '');
 }
@@ -69,7 +82,7 @@ function readCSV(filePath, callback) {
                         });
                     } catch (fieldErr) {
                         const fieldName = ['ifuFournisseur', 'numFacture', 'datePaiement', 'dateOperation', 'refNatOpt', 'montantHT', 'tauxTvax', 'tauxRetenuSource'][index];
-                        console.error(`❌ Erreur lors de l'analyse du champ ${fieldName} à la ligne ${index + 1} :`, fieldErr);
+                        logger.error(`❌ Erreur lors de l'analyse du champ ${fieldName} à la ligne ${index + 1} :`, fieldErr);
                         alert(`❌ Erreur lors de l'analyse du champ ${fieldName} à la ligne ${index + 1} : ${fieldErr.message}`);
                     }
                 }

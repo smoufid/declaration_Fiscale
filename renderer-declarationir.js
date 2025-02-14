@@ -88,7 +88,7 @@ function readCSV(filePath, callback) {
               
             });
           } catch (error) {
-            logger.error(
+            logger.error( 
               `Erreur lors du traitement de la ligne: ${line}.  Erreur detaille: ${error.message}`
             );
             alert(

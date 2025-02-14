@@ -2,8 +2,21 @@ const { ipcRenderer, remote } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const xml2js = require('xml2js');
-//const config = require('../config.json');
-// Fonction pour nettoyer le texte
+const winston = require("winston");
+
+const logger = winston.createLogger({
+  level: "info",
+  format: winston.format.combine(
+    winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), // Ajout de la date
+    winston.format.printf(({ timestamp, level, message }) => {
+      return `${timestamp} [${level.toUpperCase()}] ${message}`;
+    })
+  ),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: "log/log-tvaEtrangere.log" }),
+  ],
+});
 function cleanText(text) {
     return text.replace(/[^\w\s]/gi, '');
 }
@@ -59,6 +72,8 @@ function readCSV(filePath, callback) {
                 return;
               }
             } else if (parts[0] === "D") {
+                try {
+                    logger.info("Ligne D : " + JSON.stringify(parts, null, 2));
                 personnels.push({
                     numeroMatricule: (parts[1].trim()), // Nettoyage du texte
                     nom: parts[2].trim(),
@@ -68,8 +83,19 @@ function readCSV(filePath, callback) {
                     montantSalaireNetImpot: parseFloat(parts[6].trim().replace(",", ".")),
                     montantContribution: parseFloat(parts[7].trim().replace(",", "."))
                 });
+            } catch (error) {
+                logger.error(
+                  `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+                );
+                alert(
+                  `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+                );
+                return;
+              }
             }
             else if (parts[0] === "P") {
+                try {
+                    logger.info("Ligne P : " + JSON.stringify(parts, null, 2));
                 virements.push({
                     mois: getMonthNumber(parts[1].trim()),
                     montantContributionVersee: parseFloat(parts[2].trim().replace(",", ".")),
@@ -79,6 +105,15 @@ function readCSV(filePath, callback) {
                     numQuittance: parts[6].trim(),
                     refMoyenPaiement: 'VM'
                 });
+            } catch (error) {
+                logger.error(
+                  `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+                );
+                alert(
+                  `Erreur lors du traitement de la ligne: ${line}. Erreur: ${error.message}`
+                );
+                return;
+              }
             }
         });
         callback({ generalData, personnels, virements });
