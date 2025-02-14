@@ -52,7 +52,7 @@ function readCSV(filePath, callback) {
 
       if (parts[0] === "E") {
         try {
-          logger.info("Ligne ID : " + JSON.stringify(parts, null, 2));
+          logger.info("Ligne E : " + JSON.stringify(parts, null, 2));
           generalData = {
             identifiantFiscal: parts[1],
             annee: parts[2],
@@ -70,7 +70,7 @@ function readCSV(filePath, callback) {
         }
       } else if (parts[0] === "D") {
         try {
-          logger.info("Ligne DETAIL : " + JSON.stringify(parts, null, 2));
+          logger.info("Ligne D : " + JSON.stringify(parts, null, 2));
           versements.push({
             nomPrenomOuRaisonSociale: cleanText(parts[1]), // Nettoyage du texte
             adresseEtranger: cleanText(parts[2]),
@@ -98,15 +98,8 @@ function readCSV(filePath, callback) {
 // Fonction pour générer le fichier XML
 function generateXML(data, outputDir) {
   const { generalData, versements } = data;
-  /*  const namespaces = {
-        xsi: 'http://www.w3.org/2001/XMLSchema-instance',
-    };*/
   const xmlData = {
     declarationNonResidents: {
-      /*    $: {
-                'xmlns:xsi': namespaces.xsi,
-                'xsi:noNamespaceSchemaLocation': 'DecChomage.xsd',
-            },*/
       identifiantFiscal: generalData.identifiantFiscal,
       annee: generalData.annee,
       periode: generalData.periode,
@@ -135,8 +128,10 @@ function generateXML(data, outputDir) {
   const filePath = path.join(outputDir, fileName);
   fs.writeFile(filePath, xmlContent, (err) => {
     if (err) {
+      logger.error("Erreur lors de la génération du fichier XML :", err); 
       alert("❌ Erreur lors de la génération du fichier XML :", err);
     } else {
+      logger.info("Fichier XML généré avec succès :" +${filePath}); 
       alert(`✅ Fichier XML généré avec succès : ${filePath}`);
     }
   });
