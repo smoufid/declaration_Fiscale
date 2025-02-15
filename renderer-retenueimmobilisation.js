@@ -13,7 +13,7 @@ const logger = winston.createLogger({
   ),
   transports: [
     new winston.transports.Console(),
-    new winston.transports.File({ filename: "log/log-tvaEtrangere.log" }),
+    new winston.transports.File({ filename: "log/log-retenueimmobilisation.log" }),
   ],
 });
 function cleanText(text) {
@@ -96,6 +96,7 @@ function readCSV(filePath, callback) {
             const parts = line.split(";").map(part => part.trim());
             if (parts[0] === "E") {
                 try{
+                    logger.info("Ligne E : " + JSON.stringify(parts, null, 2));
                 generalData = {
                     identifiantFiscal: parts[1],
                     exerciceFiscalDu: parts[2],
@@ -116,6 +117,7 @@ function readCSV(filePath, callback) {
               }
             } else if (parts[0] === "T") {
                 try{
+                    logger.info("Ligne T : " + JSON.stringify(parts, null, 2));
                 terrains.push({
                     refNatureAcquision: codenatacquisitionterrains(parts[1].trim()), // Nettoyage du texte
                     estImmatricule: '1',
@@ -138,6 +140,7 @@ function readCSV(filePath, callback) {
               }
             }else if (parts[0] === "M") {
                 try{
+                    logger.info("Ligne M : " + JSON.stringify(parts, null, 2));
                 materiels.push({ refDesignationMat : retRefMateriel(parts[1].trim()),
                 refEtatAcquision:retRefEtatAcquisitionMateriel(parts[2].trim().toUpperCase()),
                 refStatutPatrimonial:refstatutsMateriel(parts[3].trim().toUpperCase()) ,
@@ -156,6 +159,7 @@ function readCSV(filePath, callback) {
           }
             }else if (parts[0] === "R") {
                 try{
+                    logger.info("Ligne R : " + JSON.stringify(parts, null, 2));
                 retraits.push({  designationRetrait: retRefMateriel(parts[1].trim()),
                     natureOperationRetrait:retrefNatureRetrait(parts[2].trim().toUpperCase()),
                     numTSC:  (parts[3].trim()),
@@ -251,6 +255,7 @@ function generateXML(data, outputDir) {
     const filePath = path.join(outputDir, fileName);
     fs.writeFile(filePath, xmlContent, (err) => {
         if (err) {
+            logger.error(`Erreur lors de la génération du fichier XML: ${err.message}`, err);
             alert("❌ Erreur lors de la génération du fichier XML :", err);
         } else {
             alert(`✅ Fichier XML généré avec succès : ${filePath}`);

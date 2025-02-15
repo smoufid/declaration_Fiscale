@@ -69,6 +69,7 @@ function readCSV(filePath, callback) {
 
         if (parts[0] === "E") {
           try {
+            logger.info("Ligne E : " + JSON.stringify(parts, null, 2));
             generalData = {
               identifiantFiscal: parts[1],
               annee: parts[2],
@@ -97,6 +98,7 @@ function readCSV(filePath, callback) {
           }
         } else if (parts[0] === "D") {
           try {
+            logger.info("Ligne D : " + JSON.stringify(parts, null, 2));
             versements.push({
               ord: cleanText(parts[1]),
               num: cleanText(parts[2]),
@@ -196,6 +198,7 @@ function generateXML(data, outputDir) {
 
   fs.writeFile(filePath, xmlContent, (err) => {
     if (err) {
+      logger.error(`Erreur lors de la génération du fichier XML : ${err.message}`,err);
       alert("❌ Erreur lors de la génération du fichier XML :", err);
     } else {
       alert(`✅ Fichier XML généré avec succès : ${filePath}`);

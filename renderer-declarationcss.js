@@ -14,7 +14,7 @@ const logger = winston.createLogger({
   ),
   transports: [
     new winston.transports.Console(),
-    new winston.transports.File({ filename: "log/log-tvaEtrangere.log" }),
+    new winston.transports.File({ filename: "log/log-declarationcss.log" }),
   ],
 });
 function cleanText(text) {
@@ -182,6 +182,7 @@ function generateXML(data, outputDir) {
     const filePath = path.join(outputDir, fileName);
     fs.writeFile(filePath, xmlContent, (err) => {
         if (err) {
+            logger.error(`❌ Erreur lors de la génération du fichier XML : ${err.message}`, err);
             alert("❌ Erreur lors de la génération du fichier XML :", err);
         } else {
             alert(`✅ Fichier XML généré avec succès : ${filePath}`);

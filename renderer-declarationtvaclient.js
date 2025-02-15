@@ -2,8 +2,21 @@ const { ipcRenderer, remote } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const xml2js = require('xml2js');
-//const config = require('../config.json');
-// Fonction pour nettoyer le texte
+const winston = require("winston");
+
+const logger = winston.createLogger({
+  level: "info",
+  format: winston.format.combine(
+    winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), // Ajout de la date
+    winston.format.printf(({ timestamp, level, message }) => {
+      return `${timestamp} [${level.toUpperCase()}] ${message}`;
+    })
+  ),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: "log/log-tvaClient.log" }),
+  ],
+});
 function cleanText(text) {
     return text.replace(/[^\w\s]/gi, '');
 }
@@ -49,12 +62,14 @@ function readCSV(filePath, callback) {
                 const parts = line.split(";").map(part => part.trim());
 
                 if (parts[0] === "E") {
+                    logger.info("Ligne E : " + JSON.stringify(parts, null, 2));
                     generalData = {
                         identifiantFiscal: parts[1],
                         annee: parts[2]
                     };
                 } else if (parts[0] === "D") {
                     try {
+                        logger.info("Ligne D : " + JSON.stringify(parts, null, 2));
                         versements.push({
                             nomPrenomAdh: cleanText(parts[1]),
                             montantCreance: parseFloat(parts[2].replace(",", ".")), // Nettoyage du texte
@@ -105,6 +120,7 @@ function generateXML(data, outputDir) {
 
     fs.writeFile(filePath, xmlContent, (err) => {
         if (err) {
+            logger.error(`Erreur lors de la génération du fichier XML : ${err.message}`,err);
             alert("❌ Erreur lors de la génération du fichier XML :", err);
         } else {
             alert(`✅ Fichier XML généré avec succès : ${filePath}`);

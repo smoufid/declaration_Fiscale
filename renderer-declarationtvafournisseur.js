@@ -14,7 +14,7 @@ const logger = winston.createLogger({
   ),
   transports: [
     new winston.transports.Console(),
-    new winston.transports.File({ filename: "log/log-tvaEtrangere.log" }),
+    new winston.transports.File({ filename: "log/log-tvaFournisseur.log" }),
   ],
 });
 function cleanText(text) {
@@ -62,6 +62,7 @@ function readCSV(filePath, callback) {
                 const parts = line.split(";").map(part => part.trim());
 
                 if (parts[0] === "E") {
+                    logger.info("Ligne E : " + JSON.stringify(parts, null, 2));
                     generalData = {
                         identifiantFiscal: parts[3],
                         annee: parts[1],
@@ -70,6 +71,7 @@ function readCSV(filePath, callback) {
                     };
                 } else if (parts[0] === "D") {
                     try {
+                        logger.info("Ligne D : " + JSON.stringify(parts, null, 2));
                         versements.push({
                             ifuFournisseur: cleanText(parts[1]), // Nettoyage du texte
                             numFacture: cleanText(parts[4]),
@@ -129,6 +131,7 @@ function generateXML(data, outputDir) {
 
     fs.writeFile(filePath, xmlContent, (err) => {
         if (err) {
+            logger.error(`❌ Erreur lors de la génération du fichier XML : ${err.message}`, err);
             alert("❌ Erreur lors de la génération du fichier XML :", err);
         } else {
             alert(`✅ Fichier XML généré avec succès : ${filePath}`);
