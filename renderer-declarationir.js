@@ -441,6 +441,7 @@ function generateXML(data, outputDir) {
     if (err) {
       alert("❌ Erreur lors de la génération du fichier XML :", err);
     } else {
+      logger.info(`Fichier XML généré avec succès: ${filePath}`);
       alert(`✅ Fichier XML généré avec succès : ${filePath}`);
     }
   });
