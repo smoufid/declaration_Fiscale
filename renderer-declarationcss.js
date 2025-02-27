@@ -30,10 +30,8 @@ function getMonthNumber(monthName) {
     return months[monthName.toLowerCase()] || "0";
 }
 function formatDate(dateStr) {
-    const [day, month, year] = dateStr.split('/');
-    const date = new Date(year, month - 1, day); // Les mois commencent à 0 dans l'objet Date
-    const formattedDate = date.toISOString().split('T')[0];
-    return formattedDate;
+    const [day, month, year] = dateStr.split("/");
+    return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
 }
 // Fonction pour lire le fichier CSV
 function readCSV(filePath, callback) {

@@ -21,16 +21,8 @@ function cleanText(text) {
     return text.replace(/[^\w\s]/gi, '');
 }
 function formatDate(dateStr) {
-    // On suppose que la date est dans le format "dd/MM/yyyy"
-    const [day, month, year] = dateStr.split('/');
-
-    // Créer un objet Date en utilisant les valeurs extraites
-    const date = new Date(year, month - 1, day); // Les mois commencent à 0 dans l'objet Date
-
-    // Formater la date dans le format "yyyy-MM-dd"
-    const formattedDate = date.toISOString().split('T')[0];
-
-    return formattedDate;
+    const [day, month, year] = dateStr.split("/");
+    return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
 }
 function getFormattedDate() {
     const now = new Date();
@@ -79,7 +71,7 @@ function readCSV(filePath, callback) {
                             dateOperation: formatDate(parts[6]),
                             refNatOpt: cleanText(parts[7]),
                             montantHT: parseFloat(parts[8].replace(",", ".")), // Conversion en nombre
-                            tauxTvax: cleanText(parts[9]),
+                            tauxTva: cleanText(parts[9]),
                             tauxRetenuSource: cleanText(parts[11])
                         });
                     } catch (fieldErr) {
@@ -116,7 +108,7 @@ function generateXML(data, outputDir) {
                     dateOperation: v.dateOperation,
                     refNatOpt: v.refNatOpt,
                     montantHT: v.montantHT.toFixed(2), // Conversion en nombre
-                    tautauxTvax: v.tautauxTvax,
+                    tauxTva: v.tauxTva,
                     tauxRetenuSource: v.tauxRetenuSource
                 }))
             }
@@ -126,7 +118,7 @@ function generateXML(data, outputDir) {
     const builder = new xml2js.Builder({ headless: false, renderOpts: { pretty: true } });
     const xmlContent = builder.buildObject(xmlData);
     const uuid = crypto.randomUUID();
-    const fileName = `RS_FINALE_FOURNISSEUR_${uuid}.xml`;
+    const fileName = `RS_FINALE_FOURNISSEUR_75_${uuid}.xml`;
     const filePath = path.join(outputDir, fileName);
 
     fs.writeFile(filePath, xmlContent, (err) => {

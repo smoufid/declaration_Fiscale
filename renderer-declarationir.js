@@ -25,10 +25,12 @@ function cleanText(text) {
   return text.replace(/[^\w\s]/gi, "");
 }
 function formatDate(dateStr) {
+  //const [day, month, year] = dateStr.split("/");
+  //const date = new Date(year, month - 1, day);  
+  //const formattedDate = date.toISOString().split("T")[0];
+  //return formattedDate;
   const [day, month, year] = dateStr.split("/");
-  const date = new Date(year, month - 1, day); // Les mois commencent à 0 dans l'objet Date
-  const formattedDate = date.toISOString().split("T")[0];
-  return formattedDate;
+  return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
 }
 function recupererElementsExo(lines, matricule) {
   let elementsExo = [];
@@ -361,11 +363,13 @@ function generateXML(data, outputDir) {
         periode: v.periode,
         mtExonere: v.mtExonere.toFixed(2),
         mtEcheances: v.mtEcheances.toFixed(2),
-        nbrReductions: v.nbrReductions.toFixed(2),
+        nbrReductions: v.nbrReductions.toFixed(0),
         mtIndemnite: v.mtIndemnite.toFixed(2),
         mtAvantages: v.mtAvantages.toFixed(2),
         mtRevenuBrutImposable: v.mtRevenuBrutImposable.toFixed(2),
         mtFraisProfess: v.mtFraisProfess.toFixed(2),
+        mtCotisationAssur: v.mtCotisationAssur.toFixed(2),
+        mtAutresRetenues:v.mtAutresRetenues.toFixed(2),
         mtRevenuNetImposable: v.mtRevenuNetImposable.toFixed(2),
         mtTotalDeduction: v.mtTotalDeduction.toFixed(2),
         irPreleve: v.irPreleve.toFixed(2),
@@ -435,7 +439,7 @@ function generateXML(data, outputDir) {
   });
   const xmlContent = builder.buildObject(xmlData);
   const uuid = crypto.randomUUID();
-  const fileName = `IR_CSSBR_${uuid}.xml`;
+  const fileName = `IR_${uuid}.xml`;
   const filePath = path.join(outputDir, fileName);
   fs.writeFile(filePath, xmlContent, (err) => {
     if (err) {
@@ -446,7 +450,6 @@ function generateXML(data, outputDir) {
     }
   });
 }
-// Écouter l'événement 'file-opened' envoyé depuis main.js
 document.getElementById("convertButtonType1").addEventListener("click", () => {
   ipcRenderer.on("file-opened", (event, filePath) => {
     alert("Fichier ouvert: " + filePath); // Afficher une alerte pour confirmer que le fichier a été ouvert
@@ -455,7 +458,6 @@ document.getElementById("convertButtonType1").addEventListener("click", () => {
       generateXML(data, outputDir);
     });
   });
-  // console.log('Convert button clicked'); // Log pour débogage
   const fileInput = document.getElementById("fileInputType1");
   if (fileInput.files.length === 0) {
     alert("Please select a CSV file first.");
@@ -469,12 +471,8 @@ document.getElementById("convertButtonType1").addEventListener("click", () => {
   const reader = new FileReader();
   reader.onload = function (e) {
     const csvData = e.target.result;
-    // const filetrt = __dirname + '/indeclarations/' + file.name;
     const filetrt = "d:/dectva/in/" + file.name;
-    // alert('Fichier ouvert: ' + filetrt);
-    // Passer les données CSV lues pour traitement
     readCSV(filetrt, (data) => {
-      //  const outputDir = __dirname + '/outdeclarations/';
       const outputDir = "d:/dectva/out/";
       generateXML(data, outputDir);
     });

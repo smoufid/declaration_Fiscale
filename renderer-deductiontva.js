@@ -32,9 +32,7 @@ function getModePaiementCode(mode) {
 }
 function formatDate(dateStr) {
   const [day, month, year] = dateStr.split("/");
-  const date = new Date(year, month - 1, day); // Les mois commencent à 0 dans l'objet Date
-  const formattedDate = date.toISOString().split("T")[0];
-  return formattedDate;
+  return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
 }
 function getFormattedDate() {
   const now = new Date();
@@ -100,17 +98,17 @@ function readCSV(filePath, callback) {
           try {
             logger.info("Ligne D : " + JSON.stringify(parts, null, 2));
             versements.push({
-              ord: cleanText(parts[1]),
-              num: cleanText(parts[2]),
-              des: cleanText(parts[3]),
-              mht: parseFloat(cleanText(parts[4]).replace(",", ".")),
-              tva: parseFloat(cleanText(parts[5]).replace(",", ".")), // Nettoyage du texte
-              ttc: parseFloat(cleanText(parts[6]).replace(",", ".")),
+              ord: cleanText(parts[1].trim()),
+              num: (parts[2].trim()),
+              des: cleanText(parts[3].trim()),
+              mht: parseFloat((parts[4].trim()).replace(",", ".")),
+              tva: parseFloat((parts[5].trim()).replace(",", ".")), // Nettoyage du texte
+              ttc: parseFloat((parts[6].trim()).replace(",", ".")),
               if: parts[7].trim(),
               nom: cleanText(parts[8].trim()),
               ice: parts[9].trim(),
               tx: parseFloat(
-                parts[10].replace("%", "").trim().replace(",", ".")
+                parts[10].trim().replace("%", "").trim().replace(",", ".")
               ),
               mp: getModePaiementCode(parts[11].trim()),
               dpai: formatDate(parts[12].trim()),
