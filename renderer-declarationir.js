@@ -434,14 +434,22 @@ function generateXML(data, outputDir) {
     };
   }
   const builder = new xml2js.Builder({
-    headless: false,
-    renderOpts: { pretty: true },
+    headless: false, // Pas de déclaration XML en haut du fichier
+    renderOpts: { pretty: true, indent: "", newline: "\r\n" }, // Formatage
+    explicitArray: false, // Éviter les tableaux inutiles
+    explicitEmpty: true, // Générer <balise></balise> au lieu de <balise/>
   });
+  /*const xmlContent = builder.buildObject(xmlData);*/
+
   const xmlContent = builder.buildObject(xmlData);
+  const fixedXmlContent = xmlContent.replace(/<([^\/>]+)\/>/g, "<$1></$1>");
+  //fixedXmlContent = `<?xml version="1.0" encoding="UTF-8"?>\r\n${fixedXmlContent}`;
+// alert(xmlContent);
   const uuid = crypto.randomUUID();
-  const fileName = `IR_${uuid}.xml`;
+  const fileName = `IR_FINALE_${uuid}.xml`;
   const filePath = path.join(outputDir, fileName);
-  fs.writeFile(filePath, xmlContent, (err) => {
+  //fs.writeFileSync(`${outputDir}/${fileName}`, xmlContent, "utf8");
+  fs.writeFile(filePath, fixedXmlContent, (err) => {
     if (err) {
       alert("❌ Erreur lors de la génération du fichier XML :", err);
     } else {
