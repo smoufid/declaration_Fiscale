@@ -13,55 +13,15 @@ function createWindow() {
       contextIsolation: false,
       enableRemoteModule: true,
     },
-    
   });
-  mainWindow.loadFile('page-main.html');
- 
+  mainWindow.loadFile('page-menu.html');
 }
 const menuTemplate = [
- /*
-  {
-    label: 'Retenues Sources TVA',
-    click() {
-      mainWindow.loadFile('retenueTvaSource.html');
-    },
-  },
-  {
-    label: 'TVA Etrangere',
-    click() {
-      mainWindow.loadFile('retenueTvaEtrangere.html');
-    },
-  },
-  {
-    label: 'TVA Fournisseur 75%',
-    click() {
-      mainWindow.loadFile('declarationtvaFournisseur75p.html');
-    },
-  },
-  {
-    label: 'TVA Client Debiteur',
-    click() {
-      mainWindow.loadFile('declarationtvaClientDebiteur.html');
-    },
-  },
-  {
-    label: 'Déduction TVA',
-    click() {
-      mainWindow.loadFile('declarationdeductiontva.html');
-    },
-  },
-  {
-    label: 'Immobilisations',
-    click() {
-      mainWindow.loadFile('declarationimmobilisations.html');
-    },
-  },*/
   {
     label: "Quitter",
     role: "quit"
 }
 ];
-
 const menu = Menu.buildFromTemplate(menuTemplate);
 Menu.setApplicationMenu(menu);
 app.on('ready', createWindow);
