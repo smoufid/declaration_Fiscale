@@ -14,7 +14,7 @@ function createWindow() {
       enableRemoteModule: true,
     },
   });
-  mainWindow.loadFile('page-menu.html');
+  mainWindow.loadFile('page-main.html');
 }
 const menuTemplate = [
   {

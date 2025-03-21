@@ -19,7 +19,10 @@ const logger = winston.createLogger({
 function cleanText(text) {
   return text.replace(/[^\w\s]/gi, "");
 }
-
+function formatDate(dateStr) {
+  const [day, month, year] = dateStr.split("/");
+  return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+}
 // Fonction pour lire le fichier CSV
 function readCSV(filePath, callback) {
   // alert(__dirname);
@@ -44,8 +47,8 @@ function readCSV(filePath, callback) {
           identifiantFiscal: parts[1],
           exerciceFiscalDu: parts[2],
           exerciceFiscalAu: parts[3],
-          montantTotalRemuneration: parseFloat(parts[4].replace(",", ".")),
-          montantRetenues: parseFloat(parts[5].replace(",", ".")),
+          montantTotalRemuneration: parseFloat(parts[4].trim().replace(",", ".")),
+          montantRetenues: parseFloat(parts[5].trim().replace(",", ".")),
         };
       } catch (error) {
         logger.error(
@@ -60,7 +63,7 @@ function readCSV(filePath, callback) {
         try{
           logger.info("Ligne D : " + JSON.stringify(parts, null, 2));
         versements.push({
-          montantBrutRemuneration:  parseFloat(parts[11].replace(",", ".")),
+          montantBrutRemuneration:  parseFloat(parts[10].trim().replace(",", ".")),
           identifiantFiscal: parts[1],
           raisonSociale : cleanText(parts[5]),
           adresse: cleanText(parts[6]),
@@ -70,10 +73,15 @@ function readCSV(filePath, callback) {
           carteSejour: cleanText(parts[3]),
           numPassport: cleanText(parts[4]),
           numeroCIN: cleanText(parts[2]),
-          tauxApplicable:  parts[12] ,
-          convention:  parts[13] ,  
-          ProduitBrutPercu:   parts[14],
-         
+          tauxApplicable:  parts[11] ,
+          convention:  parts[12] ,  
+          ProduitBrutPercu:   parts[13],
+          montantPrincipal:  parseFloat(parts[14].trim().replace(",", ".")),
+          montantMajoration:  parseFloat(parts[15].trim().replace(",", ".")),
+          montantPenalite:  parseFloat(parts[16].trim().replace(",", ".")),
+          mois:  parts[17].trim(),
+          dateVersement:  formatDate( parts[18].trim()),
+          numQuittance:  parts[19].trim()
         });
       } catch (error) {
         logger.error(
@@ -105,7 +113,6 @@ function generateXML(data, outputDir) {
       remunerations: {
         Remuneration: versements.map((v) => ({
           montantBrutRemuneration:  v.montantBrutRemuneration.toFixed(2),
-         
           beneficiaire:{
             identifiantFiscal: v.identifiantFiscal,
           raisonSociale : v.raisonSociale,
@@ -129,6 +136,18 @@ function generateXML(data, outputDir) {
           
         })),
       },
+      retenuesVersees: {
+        RetenueVersee: versements.map((v) => ({
+
+          montantPrincipal:  v.montantPrincipal.toFixed(2),
+          montantMajoration: v.montantMajoration.toFixed(2),
+          montantPenalite:  v.montantPenalite.toFixed(2),
+          mois:  v.mois.trim(),
+          dateVersement:  v.dateVersement.trim(),
+          numQuittance:  v.numQuittance.trim()
+          
+        })),
+      },
     },
   };
   const builder = new xml2js.Builder({
@@ -137,7 +156,7 @@ function generateXML(data, outputDir) {
   });
   const xmlContent = builder.buildObject(xmlData);
   const uuid = crypto.randomUUID();
-  const fileName = `DECLARATION_TIERS_NON_RESIDENTFINALE_${uuid}.xml`;
+  const fileName = `DECLARATION_TIERS_NON_RESIDENT_FINALE_${uuid}.xml`;
   const filePath = path.join(outputDir, fileName);
 
   fs.writeFile(filePath, xmlContent, (err) => {

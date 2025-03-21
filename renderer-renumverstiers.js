@@ -109,7 +109,7 @@ function generateXML(data, outputDir) {
           honorairesRAS: v.honorairesRAS.toFixed(2),
           commissionsRAS: v.commissionsRAS.toFixed(2),
           montantRetenue: v.montantRetenue.toFixed(2),
-          montantRemun: v.montantRemun.toFixed(2),
+          // montantRemun: v.montantRemun.toFixed(2),
           beneficiaire: {
           identifiantFiscal: v.identifiantFiscal,
           raisonSociale: v.raisonSociale,
