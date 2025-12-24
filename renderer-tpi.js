@@ -14,9 +14,18 @@ const logger = winston.createLogger({
   ),
   transports: [
     new winston.transports.Console(),
-    new winston.transports.File({ filename: "log/log-facturesretards.log" }),
+    new winston.transports.File({ filename: "log/log-tpi.log" }),
   ],
 });
+function reupererlibelleNature(mode) {
+    const modeMapping = {
+        '1': 'Villa',
+        '2': 'Immeuble',
+        '3': 'Maison traditionnelle',
+        '9':'Terrain avec construction'
+    };
+    return modeMapping[mode] || '';  
+}
 function cleanText(text) {
     return text.replace(/[^\w\s]/gi, '');
 }
@@ -56,34 +65,31 @@ function readCSV(filePath, callback) {
                 if (parts[0] === "E") {
                     logger.info("Ligne E : " + JSON.stringify(parts, null, 2));
                     generalData = {
-                        identifiantFiscal: parts[3],
-                        annee: parts[1],
-                        periode: parts[2],
-                        activite: '1',
-                        chiffreAffaire: parseFloat(parts[5].replace(",", ".")),
+                        identifiantFiscal: parts[2],
+                        exerciceFiscalDu: parts[3],
+                        exerciceFiscalAu: parts[4],
+                        annee: parts[5],
+                        mois:  parts[6] ,
                     };
                 } else if (parts[0] === "D") {
                     try {
                         logger.info("Ligne D : " + JSON.stringify(parts, null, 2));
                         versements.push({
-                            identifiantFiscal: cleanText(parts[1]), // Nettoyage du texte
-                            numRC: cleanText(parts[3]),
-                            adresse: cleanText(parts[2]),
-                            numFacture: (parts[4]), // Nettoyage du texte
-                            dateEmission: formatDate(parts[5]),
-                            natureMarchandise: cleanText(parts[6]),
-                            dateLivraisonMarchandise: formatDate(parts[7]),
-                             datePrevuePaiement: formatDate(parts[8]),
-                            montantFactureTtc: parseFloat(parts[9].replace(",", ".")), // Conversion en nombre
-                            montantNonEncorePaye: parseFloat(parts[10].replace(",", ".")), // Conversion en nombre
-                            montantPayeHorsDelai: parseFloat(parts[11].replace(",", ".")), // Conversion en nombre
-                            datePaiementHorsDelai: formatDate(parts[12]),
-                            modePaiement: cleanText(parts[13]),
-                            referencePaiement:  (parts[14])
+                            numCniPassCsEBeneficiaire: cleanText(parts[2]), // Nettoyage du texte
+                            nomPrenomBeneficiaire: cleanText(parts[3]),
+                            adresseBeneficiaire: cleanText(parts[4]),
+                            adresseImmeuble: (parts[6]), // Nettoyage du texte
+                            numTitreFoncier:  (parts[7]),
+                            numArticleTSC:  (parts[8]),
+                            dateVersement: formatDate(parts[11]),
+                             nomRsProprietaire:  (parts[9]),
+                            ifuProprietaire: (parts[10] ), // Conversion en nombre
+                            montantBrutVerse: parseFloat(parts[12].replace(",", ".")), // Conversion en nombre
+                            taux: 'RSTIJ.5.2025', // Conversion en nombre
+                            refNature:  (parts[5])
                         });
                     } catch (fieldErr) {
-                        const fieldName = ['identifiantFiscal', 'numRC', 'adresse', 'numFacture', 'dateEmission', 'natureMarchandise', 'dateLivraisonMarchandise', 'datePrevuePaiement', 'montantFactureTtc', 'montantNonEncorePaye', 'montantPayeHorsDelai', 'datePaiementHorsDelai', 'modePaiement', 'referencePaiement'][index];
-                        logger.error(`❌ Erreur lors de l'analyse du champ ${fieldName} à la ligne ${index + 1} :`, fieldErr);
+                        
                         alert(`❌ Erreur lors de l'analyse du champ ${fieldName} à la ligne ${index + 1} : ${fieldErr.message}`);
                     }
                 }
@@ -91,8 +97,8 @@ function readCSV(filePath, callback) {
 
             callback({ generalData, versements });
         } catch (parseErr) {
-            console.error("❌ Erreur lors de l'analyse du fichier CSV :", parseErr);
-            alert("❌ Erreur lors de l'analyse du fichier CSV : " + parseErr.message);
+            alert("❌ Erreur lors de l'analyse du fichier CSV :", parseErr);
+           // alert("❌ Erreur lors de l'analyse du fichier CSV : " + parseErr.message);
         }
     });
 }
@@ -101,30 +107,36 @@ function readCSV(filePath, callback) {
 function generateXML(data, outputDir) {
     const { generalData, versements } = data;
     const datesys = getFormattedDate();
+   const namespaces = {
+  "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+  "xsi:noNamespaceSchemaLocation": "VersementRSTIJ.xsd",
+};
     const xmlData = {
-        DeclarationDelaiPaiement: {
+        VersementRSTIJ 
+            : {
+      $: {
+        "xmlns:xsi": namespaces["xmlns:xsi"],
+      "xsi:noNamespaceSchemaLocation": namespaces["xsi:noNamespaceSchemaLocation"],
+      },
             identifiantFiscal: generalData.identifiantFiscal,
+                        exerciceFiscalDu: generalData.exerciceFiscalDu,
+                        exerciceFiscalAu: generalData.exerciceFiscalAu,
                         annee: generalData.annee,
-                        periode: generalData.periode,
-                        activite: generalData.activite,
-                        chiffreAffaire: generalData.chiffreAffaire.toFixed(2), // Conversion en nombre
-            listeFacturesHorsDelai: {
-                FactureHorsDelai: versements.map(v => ({
-                            identifiantFiscal: v.identifiantFiscal, // Nettoyage du texte
-                            numRC: v.numRC,
-                            adresseSiegeSocial: v.adresse,
-                            numFacture: v.numFacture, // Nettoyage du texte
-                            dateEmission: v.dateEmission,
-                            natureMarchandise: v.natureMarchandise,
-                            dateLivraisonMarchandise: v.dateLivraisonMarchandise,
-                            datePrevuePaiement: v.datePrevuePaiement,
-                            montantFactureTtc: v.montantFactureTtc.toFixed(2), // Conversion en nombre
-                            montantNonEncorePaye: v.montantNonEncorePaye.toFixed(2), // Conversion en nombre
-                            montantPayeHorsDelai: v.montantPayeHorsDelai.toFixed(2), // Conversion en nombre
-                            datePaiementHorsDelai: v.datePaiementHorsDelai,
-                            modePaiement: v.modePaiement,
-                            referencePaiement: v.referencePaiement
-                }))
+                        mois:  generalData.mois ,
+            lisDetailVersRSTIJs: {
+                DetailVersRSTIJ: versements.map(v => ({
+                           numCniPassCsEBeneficiaire: v.numCniPassCsEBeneficiaire, // Nettoyage du texte
+                            nomPrenomBeneficiaire: v.nomPrenomBeneficiaire,
+                            adresseBeneficiaire: v.adresseBeneficiaire,
+                            adresseImmeuble: v.adresseImmeuble,
+                            numTitreFoncier:  v.numTitreFoncier,
+                            numArticleTSC:  v.numArticleTSC,
+                            dateVersement: v.dateVersement,
+                             nomRsProprietaire:  v.nomRsProprietaire,
+                            ifuProprietaire: v.ifuProprietaire, // Conversion en nombre
+                            montantBrutVerse: v.montantBrutVerse.toFixed(2), // Conversion en nombre
+                          taux: {  code: v.taux,},
+                            refNature:{  id: v.refNature,}                }))
             }
         }
     };
@@ -132,7 +144,7 @@ function generateXML(data, outputDir) {
     const builder = new xml2js.Builder({ headless: false, renderOpts: { pretty: true } });
     const xmlContent = builder.buildObject(xmlData);
     const uuid = crypto.randomUUID();
-    const fileName = `RS_FINALE_Factures_Hors_Delais_${uuid}.xml`;
+    const fileName = `RS_FINALE_Declararation_RSTPI_${uuid}.xml`;
     const filePath = path.join(outputDir, fileName);
 
     fs.writeFile(filePath, xmlContent, (err) => {

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Convertion Declaration TPI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  
+</head>
+<body>
+  <section class="hero is-primary is-bold">
+    <div id="contenu"></div>
+    <script>
+      fetch("page-menu.html")
+        .then(response => response.text()) 
+        .then(data => document.getElementById("contenu").innerHTML = data)
+        .catch(error => console.error("Erreur de chargement :", error));
+    </script>
+    <div class="hero-body">
+      <h1 class="title">Convertion Declaration TPI</h1>
+      <div class="field">
+        <div class="file is-info">
+          <label class="file-label">
+            <input class="file-input" type="file" id="fileInputType1" accept=".csv">
+            <span class="file-cta">
+              <span class="file-label">Choisir un fichier CSV...</span>
+            </span>
+          </label>
+        </div>
+      </div>
+      <div class="field">
+        <button class="button is-primary" id="convertButtonType1">Conversion en XML</button>
+      </div>
+      <pre id="outputType1" class="box"> le Fichier source doit être dans le repertoire d:/dectva/in/</pre>
+      <pre id="outputType2" class="box"> le Fichier Resultat sera generer dans le repertoire d:/dectva/out/</pre>
+    </div>
+  </section>
+  <script src="renderer-tpi.js"></script>
+</body>
+</html>
