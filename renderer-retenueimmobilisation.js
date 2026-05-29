@@ -28,21 +28,21 @@ function retRefEtatAcquisitionMateriel(mode) {
         'NEUF': 'NEUF_1',
         'OCCASIONNEL': 'OCCASION_2'
     };
-    return modeMapping[mode] || '';  
+    return modeMapping[mode] || 'NEUF_1';  
 }
 function retrefNatureRetrait(mode) {
     const modeMapping = {
         'RETRAIT': 'RETRAIT_1',
         'CESSION': 'CESSION_2'
     };
-    return modeMapping[mode] || 'RESIL_BAIL_2';  
+    return modeMapping[mode] || 'RETRAIT_1';  
 }
 function refstatutsTerrains(mode) {
     const modeMapping = {
         'LOCATION': 'LOCATION_2',
         'LEASING': 'LEASING_3'
     };
-    return modeMapping[mode] || 'PROPRIETE_1';  
+    return modeMapping[mode] || 'LOCATION_2';  
 }
 function retRefMateriel(mode) {
     //alert(mode);
@@ -54,7 +54,7 @@ function retRefMateriel(mode) {
         'Matériel roulant autre que matériel de transport':'TRANSPORT_6',
         'Mobilier, matériel de bureau et aménagement divers':'MOBILIER_7'
     };
-    return modeMapping[mode] || 'TERRAIN_1';  
+    return modeMapping[mode] || 'CONSTRUCT_2';  
 }
 function codenatacquisitionterrains(mode) {
     const modeMapping = {
@@ -63,14 +63,14 @@ function codenatacquisitionterrains(mode) {
         'Agencements': 'AGENCEMENT_3',   
         'Aménagements': 'AMENAGEMENT_4'
     };
-    return modeMapping[mode] || '';  
+    return modeMapping[mode] || 'TERRAIN_1';  
 }
 function refstatutsMateriel(mode) {
     const modeMapping = {
         'LOCATION': 'LOCATION_2',
         'leasiLEASING': 'LEASING_3',
     };
-    return modeMapping[mode] || 'PROPRIETE_1';
+    return modeMapping[mode] || 'LOCATION_2';
 }
 // Fonction pour lire le fichier CSV
 function readCSV(filePath, callback) {

@@ -58,10 +58,10 @@ function readCSV(filePath, callback) {
             const lines = data.split("\n").map(line => line.trim()).filter(line => line !== "");
             let generalData = {};
             let versements = [];
-
+alert(`CSV data loaded and parsed ${JSON.stringify(lines)} lines`); // Log pour débogage
             lines.forEach((line, index) => {
                 const parts = line.split(";").map(part => part.trim());
-
+//alert(`Processing line ${index + 1}: ${JSON.stringify(parts)}`); // Log pour débogage
                 if (parts[0] === "E") {
                     logger.info("Ligne E : " + JSON.stringify(parts, null, 2));
                     generalData = {
